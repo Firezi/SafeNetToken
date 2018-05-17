@@ -13,6 +13,8 @@ contract Treaties {
 
     address public wallet;
 
+    uint public walletPercentage = 100;
+
     address[] public owners;
     address[] public teams;
     address[] public investors;
@@ -24,11 +26,12 @@ contract Treaties {
     mapping (address => uint) public refunds;
 
     struct Request {
-        uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat)
+        uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat), 4 - new
         address beneficiary;
         string treatyHash;
         uint tokensAmount;
         uint ethAmount;
+        uint percentage;
 
         uint8 isConfirmed; // 0 - pending, 1 - declined, 2 - accepted
         address[] ownersConfirm;
@@ -44,7 +47,7 @@ contract Treaties {
         }
     }   
 
-    event NewRequest(uint8 rType, address beneficiary, string treatyHash, uint tokensAmount, uint ethAmount, uint id);
+    event NewRequest(uint8 rType, address beneficiary, string treatyHash, uint tokensAmount, uint ethAmount, uint percentage, uint id);
     event RequestConfirmed(uint id);
     event RequestDeclined(uint id);
     event RefundsCalculated();
@@ -80,11 +83,12 @@ contract Treaties {
             treatyHash: _treatyHash,
             tokensAmount: _tokensAmount,
             ethAmount: 0,
+            percentage: 0,
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
 
-        emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, 0, requests.length - 1);
+        emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, 0, 0, requests.length - 1);
     }
 
     function createEthInvestorRequest(uint _tokensAmount) public payable {
@@ -96,11 +100,12 @@ contract Treaties {
             treatyHash: '',
             tokensAmount: _tokensAmount,
             ethAmount: msg.value,
+            percentage: 0,
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
 
-        emit NewRequest(2, msg.sender, "", _tokensAmount, msg.value, requests.length - 1);
+        emit NewRequest(2, msg.sender, "", _tokensAmount, msg.value, 0, requests.length - 1);
     }
 
     function removeEthInvestorRequest(uint id) public {
@@ -120,11 +125,29 @@ contract Treaties {
             treatyHash: '',
             tokensAmount: _tokensAmount,
             ethAmount: 0,
+            percentage: 0,
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
 
-        emit NewRequest(3, msg.sender, "", _tokensAmount, 0, requests.length - 1);
+        emit NewRequest(3, msg.sender, "", _tokensAmount, 0, 0, requests.length - 1);
+    }
+
+    function createPercentageRequest(uint _percentage) public onlyOwner {
+        require(_percentage <= 100);
+
+        requests.push(Request({
+            rType: 4,
+            beneficiary: msg.sender,
+            treatyHash: '',
+            tokensAmount: 0,
+            ethAmount: 0,
+            percentage: _percentage,
+            isConfirmed: 0,
+            ownersConfirm: new address[](0)
+            }));
+
+        emit NewRequest(4, msg.sender, "", 0, 0, _percentage, requests.length - 1);
     }
 
 
@@ -147,25 +170,31 @@ contract Treaties {
         }
 
         if (tokensConfirmed > tokensInOwners / 2) {
-            if (!inList[requests[id].beneficiary]) {
-                if (requests[id].rType == 0) {
-                    owners.push(requests[id].beneficiary);
+            if (requests[id].rType == 5) {
+                walletPercentage = requests[id].percentage;
+
+            } else {
+                if (!inList[requests[id].beneficiary]) {
+                    if (requests[id].rType == 0) {
+                        owners.push(requests[id].beneficiary);
+                    }
+                    if (requests[id].rType == 1) {
+                        teams.push(requests[id].beneficiary);
+                    }
+                    if (requests[id].rType == 2 || requests[id].rType == 3) {
+                        investors.push(requests[id].beneficiary);
+                    }
+                    inList[requests[id].beneficiary] = true;
                 }
-                if (requests[id].rType == 1) {
-                    teams.push(requests[id].beneficiary);
+
+                if (requests[id].rType == 2) {
+                    assert(wallet.send(requests[id].ethAmount));
                 }
-                if (requests[id].rType == 2 || requests[id].rType == 3) {
-                    investors.push(requests[id].beneficiary);
-                }
-                inList[requests[id].beneficiary] = true;
+
+                token.transfer(requests[id].beneficiary, requests[id].tokensAmount);
+                tokensInUse += requests[id].tokensAmount;
             }
 
-            if (requests[id].rType == 2) {
-                assert(wallet.send(requests[id].ethAmount));
-            }
-            
-            token.transfer(requests[id].beneficiary, requests[id].tokensAmount);
-            tokensInUse += requests[id].tokensAmount;
             requests[id].isConfirmed = 2;
             emit RequestConfirmed(id);
         }
@@ -191,19 +220,19 @@ contract Treaties {
         address addr;
         for (uint i = 0; i < owners.length; i++) {
             addr = owners[i];
-            refund = profit.mul(token.balanceOf(addr)).mul(40).div(100).div(tokensInUse);
+            refund = profit.mul(token.balanceOf(addr)).mul(100 - walletPercentage).div(100).div(tokensInUse);
             refunds[addr] += refund;
             rest -= refund;
         }
         for (i = 0; i < teams.length; i++) {
             addr = teams[i];
-            refund = profit.mul(token.balanceOf(addr)).mul(40).div(100).div(tokensInUse);
+            refund = profit.mul(token.balanceOf(addr)).mul(100 - walletPercentage).div(100).div(tokensInUse);
             refunds[addr] += refund;
             rest -= refund;
         }
         for (i = 0; i < investors.length; i++) {
             addr = investors[i];
-            refund = profit.mul(token.balanceOf(addr)).mul(40).div(100).div(tokensInUse);
+            refund = profit.mul(token.balanceOf(addr)).mul(100 - walletPercentage).div(100).div(tokensInUse);
             refunds[addr] += refund;
             rest -= refund;
         }
