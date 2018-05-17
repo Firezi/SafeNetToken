@@ -17,11 +17,11 @@ contract Treaties {
     address[] public companies;
     address[] public holders;
 
-    mapping (address => bool) inList;
+    mapping (address => bool) public inList;
 
     uint public tokensInUse = 0;
 
-    mapping (address => uint) refunds;
+    mapping (address => uint) public refunds;
 
     struct Request {
         uint8 rType; // 0 - owner, 1 - company, 2 - holder
