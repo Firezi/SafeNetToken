@@ -24,7 +24,7 @@ contract Treaties {
     mapping (address => uint) public refunds;
 
     struct Request {
-        uint8 rType; // 0 - owner, 1 - team, 2 - investor
+        uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat)
         address beneficiary;
         string treatyHash;
         uint tokensAmount;
@@ -44,8 +44,10 @@ contract Treaties {
         }
     }   
 
-    event NewRequest(uint8 rType, address beneficiary, string treatyHash, uint tokensAmount, uint id);
-
+    event NewRequest(uint8 rType, address beneficiary, string treatyHash, uint tokensAmount, uint ethAmount, uint id);
+    event RequestConfirmed(uint id);
+    event RequestDeclined(uint id);
+    event RefundsCalculated();
 
     function Treaties(address _wallet, SafeNetToken _token) public {
         creator = msg.sender;
@@ -82,7 +84,7 @@ contract Treaties {
             ownersConfirm: new address[](0)
             }));
 
-        emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, requests.length - 1);
+        emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, 0, requests.length - 1);
     }
 
     function createInvestorRequest(uint _tokensAmount) public payable {
@@ -97,6 +99,8 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+
+        emit NewRequest(2, msg.sender, "", _tokensAmount, msg.value, requests.length - 1);
     }
 
     function removeInvestorRequest(uint id) public {
@@ -106,6 +110,7 @@ contract Treaties {
 
         requests[id].isConfirmed = 1;
         assert(msg.sender.send(requests[id].ethAmount));
+        emit RequestDeclined(id);
     }
 
 
@@ -148,6 +153,7 @@ contract Treaties {
             token.transfer(requests[id].beneficiary, requests[id].tokensAmount);
             tokensInUse += requests[id].tokensAmount;
             requests[id].isConfirmed = 2;
+            emit RequestConfirmed(id);
         }
     }
 
@@ -189,6 +195,7 @@ contract Treaties {
         }
 
         assert(wallet.send(rest));
+        emit RefundsCalculated();
     }
 
     function withdrawRefunds() public {
