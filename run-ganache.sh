@@ -1,3 +1,5 @@
+#accounts for testing
+
 ganache-cli \
 --account="0x380818bbf72d9158ab0e2ba91bff22635e3e51a2d6c1c9e06adaacd544d56526, 100000000000000000000" \
 --unlock "0xbbd14e13bef663e1066a42e2079f8f05d636bffb" \
