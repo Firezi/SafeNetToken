@@ -31,7 +31,7 @@ contract Treaties {
         uint ethAmount;
 
         uint8 isConfirmed; // 0 - pending, 1 - declined, 2 - accepted;
-        address[] onwersConfirm;
+        address[] ownersConfirm;
     }
 
     Request[] public requests;
@@ -79,7 +79,7 @@ contract Treaties {
             tokensAmount: _tokensAmount,
             ethAmount: 0,
             isConfirmed: 0,
-            onwersConfirm: new address[](0)
+            ownersConfirm: new address[](0)
             }));
 
         emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, requests.length - 1);
@@ -95,7 +95,7 @@ contract Treaties {
             tokensAmount: _tokensAmount,
             ethAmount: msg.value,
             isConfirmed: 0,
-            onwersConfirm: new address[](0)
+            ownersConfirm: new address[](0)
             }));
     }
 
@@ -114,12 +114,12 @@ contract Treaties {
         assert(requests[id].isConfirmed == 0);
 
         uint tokensConfirmed = 0;
-        for (uint i = 0; i < requests[id].onwersConfirm.length; i++) {
-            assert(requests[id].onwersConfirm[i] != msg.sender);
-            tokensConfirmed += token.balanceOf(requests[id].onwersConfirm[i]);
+        for (uint i = 0; i < requests[id].ownersConfirm.length; i++) {
+            assert(requests[id].ownersConfirm[i] != msg.sender);
+            tokensConfirmed += token.balanceOf(requests[id].ownersConfirm[i]);
         }
 
-        requests[id].onwersConfirm.push(msg.sender);
+        requests[id].ownersConfirm.push(msg.sender);
         tokensConfirmed += token.balanceOf(msg.sender);
 
         uint tokensInOwners = 0;
@@ -155,10 +155,10 @@ contract Treaties {
         require(id < requests.length);
         assert(requests[id].isConfirmed == 0);
 
-        for (uint i = 0; i < requests[id].onwersConfirm.length; i++) {
-            if (requests[id].onwersConfirm[i] == msg.sender) {
-                requests[id].onwersConfirm[i] = requests[id].onwersConfirm[requests[id].onwersConfirm.length - 1];
-                requests[id].onwersConfirm.length--;
+        for (uint i = 0; i < requests[id].ownersConfirm.length; i++) {
+            if (requests[id].ownersConfirm[i] == msg.sender) {
+                requests[id].ownersConfirm[i] = requests[id].ownersConfirm[requests[id].ownersConfirm.length - 1];
+                requests[id].ownersConfirm.length--;
                 break;
             }
         }
@@ -197,5 +197,4 @@ contract Treaties {
         refunds[msg.sender] = 0;
         assert(msg.sender.send(refund));
     }
-
 }
