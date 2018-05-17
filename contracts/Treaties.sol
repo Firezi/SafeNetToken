@@ -127,7 +127,7 @@ contract Treaties {
             tokensInOwners += token.balanceOf(owners[i]);
         }
 
-        if (tokensConfirmed > tokensInOwners * 75 / 100) {
+        if (tokensConfirmed > tokensInOwners / 2) {
             if (!inList[requests[id].beneficiary]) {
                 if (requests[id].rType == 0) {
                     owners.push(requests[id].beneficiary);
