@@ -14,8 +14,8 @@ contract Treaties {
     address public wallet;
 
     address[] public owners;
-    address[] public companies;
-    address[] public holders;
+    address[] public teams;
+    address[] public investors;
 
     mapping (address => bool) public inList;
 
@@ -24,13 +24,13 @@ contract Treaties {
     mapping (address => uint) public refunds;
 
     struct Request {
-        uint8 rType; // 0 - owner, 1 - company, 2 - holder
+        uint8 rType; // 0 - owner, 1 - team, 2 - investor
         address beneficiary;
         string treatyHash;
         uint tokensAmount;
         uint ethAmount;
 
-        uint8 isConfirmed; // 0 - pending, 1 - declined, 2 - accepted;
+        uint8 isConfirmed; // 0 - pending, 1 - declined, 2 - accepted
         address[] ownersConfirm;
     }
 
@@ -85,7 +85,7 @@ contract Treaties {
         emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, requests.length - 1);
     }
 
-    function createHolderRequest(uint _tokensAmount) public payable {
+    function createInvestorRequest(uint _tokensAmount) public payable {
         assert(msg.value > 0);
 
         requests.push(Request({
@@ -99,7 +99,7 @@ contract Treaties {
             }));
     }
 
-    function removeHolderRequest(uint id) public {
+    function removeInvestorRequest(uint id) public {
         require(id < requests.length);
         assert(requests[id].isConfirmed == 0 && requests[id].rType == 2);
         assert(requests[id].beneficiary == msg.sender);
@@ -133,10 +133,10 @@ contract Treaties {
                     owners.push(requests[id].beneficiary);
                 }
                 if (requests[id].rType == 1) {
-                    companies.push(requests[id].beneficiary);
+                    teams.push(requests[id].beneficiary);
                 }
                 if (requests[id].rType == 2) {
-                    holders.push(requests[id].beneficiary);
+                    investors.push(requests[id].beneficiary);
                 }
                 inList[requests[id].beneficiary] = true;
             }
@@ -175,14 +175,14 @@ contract Treaties {
             refunds[addr] += refund;
             rest -= refund;
         }
-        for (i = 0; i < companies.length; i++) {
-            addr = companies[i];
+        for (i = 0; i < teams.length; i++) {
+            addr = teams[i];
             refund = profit.mul(token.balanceOf(addr)).mul(40).div(100).div(tokensInUse);
             refunds[addr] += refund;
             rest -= refund;
         }
-        for (i = 0; i < holders.length; i++) {
-            addr = holders[i];
+        for (i = 0; i < investors.length; i++) {
+            addr = investors[i];
             refund = profit.mul(token.balanceOf(addr)).mul(40).div(100).div(tokensInUse);
             refunds[addr] += refund;
             rest -= refund;
