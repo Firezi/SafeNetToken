@@ -26,7 +26,7 @@ contract Treaties {
     mapping (address => uint) public refunds;
 
     struct Request {
-        uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat), 4 - new
+        uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat), 4 - new percentage
         address beneficiary;
         string treatyHash;
         uint tokensAmount;
@@ -170,7 +170,7 @@ contract Treaties {
         }
 
         if (tokensConfirmed > tokensInOwners / 2) {
-            if (requests[id].rType == 5) {
+            if (requests[id].rType == 4) {
                 walletPercentage = requests[id].percentage;
 
             } else {
