@@ -87,7 +87,7 @@ contract Treaties {
         emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, 0, requests.length - 1);
     }
 
-    function createInvestorRequest(uint _tokensAmount) public payable {
+    function createEthInvestorRequest(uint _tokensAmount) public payable {
         assert(msg.value > 0);
 
         requests.push(Request({
@@ -103,7 +103,7 @@ contract Treaties {
         emit NewRequest(2, msg.sender, "", _tokensAmount, msg.value, requests.length - 1);
     }
 
-    function removeInvestorRequest(uint id) public {
+    function removeEthInvestorRequest(uint id) public {
         require(id < requests.length);
         assert(requests[id].isConfirmed == 0 && requests[id].rType == 2);
         assert(requests[id].beneficiary == msg.sender);
@@ -111,6 +111,20 @@ contract Treaties {
         requests[id].isConfirmed = 1;
         assert(msg.sender.send(requests[id].ethAmount));
         emit RequestDeclined(id);
+    }
+
+    function createFiatInvestorRequest(uint _tokensAmount) public {
+        requests.push(Request({
+            rType: 3,
+            beneficiary: msg.sender,
+            treatyHash: '',
+            tokensAmount: _tokensAmount,
+            ethAmount: 0,
+            isConfirmed: 0,
+            ownersConfirm: new address[](0)
+            }));
+
+        emit NewRequest(3, msg.sender, "", _tokensAmount, 0, requests.length - 1);
     }
 
 
@@ -140,7 +154,7 @@ contract Treaties {
                 if (requests[id].rType == 1) {
                     teams.push(requests[id].beneficiary);
                 }
-                if (requests[id].rType == 2) {
+                if (requests[id].rType == 2 || requests[id].rType == 3) {
                     investors.push(requests[id].beneficiary);
                 }
                 inList[requests[id].beneficiary] = true;
