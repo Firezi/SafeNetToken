@@ -177,6 +177,7 @@ contract Treaties {
                 if (!inList[requests[id].beneficiary]) {
                     if (requests[id].rType == 0) {
                         owners.push(requests[id].beneficiary);
+                        token.transfer(creator, requests[id].tokensAmount / 10);
                     }
                     if (requests[id].rType == 1) {
                         teams.push(requests[id].beneficiary);
