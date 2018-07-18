@@ -43,6 +43,10 @@ export default {
       treatyText: ''
     }
   },
+  beforeCreate() {
+    console.log('registerWeb3 Action dispatched');
+    this.$store.dispatch('registerWeb3')
+  },
   computed: {
     isValid() {
       if (this.selectedType === 1 || this.selectedType === 2) {
