@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import SntRequest from '@/components/snt-request'
+import EnterRequest from '@/components/enter-request'
 Vue.use(Router);
 
 export default new Router({
   routes: [
     {
       path: '/',
-      name: 'snt-request',
-      component: SntRequest
+      name: 'enter-request',
+      component: EnterRequest
     }
   ]
 })

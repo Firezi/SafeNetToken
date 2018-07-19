@@ -28,7 +28,7 @@
 
 <script>
 export default {
-  name: 'snt-request',
+  name: 'enter-request',
   data: function () {
     return {
       selectedType: 0,
