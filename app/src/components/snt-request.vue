@@ -65,10 +65,13 @@ export default {
   },
   methods: {
     transact: function () {
-      // if (this.selectedType === 1 || this.selectedType === 2) {
-      //
-      // }
-      // this.selectedType = 0;
+      if (this.selectedType === 1 || this.selectedType === 2) {
+        let tokensWei = (this.tokensAmount * 10 ** 9).toString() + "000000000";
+        this.$store.state.contractInstance().methods.createTreatyRequest(this.selectedType - 1, this.treatyText, tokensWei).send({
+          from:this.$store.state.web3.coinbase
+        });
+      }
+      this.selectedType = 0;
       this.tokensAmount = '';
       this.ethAmount = '';
       this.treatyText = '';
