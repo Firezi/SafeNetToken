@@ -65,9 +65,21 @@ export default {
   },
   methods: {
     transact: function () {
+      let tokensWei = (this.tokensAmount * 10 ** 9).toString() + "000000000";
       if (this.selectedType === 1 || this.selectedType === 2) {
-        let tokensWei = (this.tokensAmount * 10 ** 9).toString() + "000000000";
         this.$store.state.contractInstance().methods.createTreatyRequest(this.selectedType - 1, this.treatyText, tokensWei).send({
+          from:this.$store.state.web3.coinbase
+        });
+      }
+      if (this.selectedType === 3) {
+        let wei = (this.ethAmount * 10 ** 9).toString() + "000000000";
+        this.$store.state.contractInstance().methods.createEthInvestorRequest(tokensWei).send({
+          from:this.$store.state.web3.coinbase,
+          value: wei
+        });
+      }
+      if (this.selectedType === 4) {
+        this.$store.state.contractInstance().methods.createFiatInvestorRequest(tokensWei).send({
           from:this.$store.state.web3.coinbase
         });
       }
