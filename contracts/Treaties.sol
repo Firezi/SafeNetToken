@@ -37,6 +37,7 @@ contract Treaties {
         address[] ownersConfirm;
     }
 
+    uint public requestsCount = 0;
     Request[] public requests;
 
     modifier onlyOwner() {
@@ -77,6 +78,7 @@ contract Treaties {
     function createTreatyRequest(uint8 _rType, string _treatyHash, uint _tokensAmount) public {
         require(_rType <= 1);
 
+        requestsCount++;
         requests.push(Request({
             rType: _rType,
             beneficiary: msg.sender,
@@ -94,6 +96,7 @@ contract Treaties {
     function createEthInvestorRequest(uint _tokensAmount) public payable {
         assert(msg.value > 0);
 
+        requestsCount++;
         requests.push(Request({
             rType: 2,
             beneficiary: msg.sender,
@@ -119,6 +122,7 @@ contract Treaties {
     }
 
     function createFiatInvestorRequest(uint _tokensAmount) public {
+        requestsCount++;
         requests.push(Request({
             rType: 3,
             beneficiary: msg.sender,
@@ -136,6 +140,7 @@ contract Treaties {
     function createPercentageRequest(uint _percentage) public onlyOwner {
         require(_percentage <= 100);
 
+        requestsCount++;
         requests.push(Request({
             rType: 4,
             beneficiary: msg.sender,
@@ -247,5 +252,18 @@ contract Treaties {
         uint refund = refunds[msg.sender];
         refunds[msg.sender] = 0;
         assert(msg.sender.send(refund));
+    }
+
+    function getRequestConfirmation(uint id) public view returns (uint tokensConfirmed, uint tokensInOwners) {
+        tokensConfirmed = 0;
+        for (uint i = 0; i < requests[id].ownersConfirm.length; i++) {
+            assert(requests[id].ownersConfirm[i] != msg.sender);
+            tokensConfirmed += token.balanceOf(requests[id].ownersConfirm[i]);
+        }
+
+        tokensInOwners = 0;
+        for (i = 0; i < owners.length; i++) {
+            tokensInOwners += token.balanceOf(owners[i]);
+        }
     }
 }
