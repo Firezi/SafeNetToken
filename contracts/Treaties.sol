@@ -54,7 +54,7 @@ contract Treaties {
     event RequestDeclined(uint id);
     event RefundsCalculated();
 
-    function Treaties(address _wallet, SafeNetToken _token) public {
+    constructor(address _wallet, SafeNetToken _token) public {
         creator = msg.sender;
         token = _token;
         wallet = _wallet;
