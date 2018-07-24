@@ -1,6 +1,7 @@
 <template>
   <div>
-    <form id="createRequestForm">
+    <h1>Create Request</h1>
+    <!--<form id="createRequestForm">-->
       <p>Choose the role:</p>
       <select v-model="selectedType">
         <option v-for="type in types" v-bind:value="type.value">
@@ -22,7 +23,7 @@
       <p v-if="selectedType > 0">
         <button :disabled=!isValid v-on:click="transact()">Send Transaction</button>
       </p>
-    </form>
+    <!--</form>-->
   </div>
 </template>
 

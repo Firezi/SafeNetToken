@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import state from './state'
 import getWeb3 from '../util/getWeb3'
 import getContract from '../util/getContract'
+import getRequestsList from '../util/getRequestsList'
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
@@ -21,6 +22,10 @@ export const store = new Vuex.Store({
     registerContractInstance (state, payload) {
       console.log('Treaty contract instance: ', payload);
       state.contractInstance = () => payload;
+    },
+    registerRequestsList (state, payload) {
+      console.log('Requests list: ', payload);
+      state.requestsList = () => payload;
     }
   },
   actions: {
@@ -34,6 +39,13 @@ export const store = new Vuex.Store({
     getContractInstance ({commit}) {
       getContract.then(result => {
         commit('registerContractInstance', result);
+      }).catch(e => {
+        console.log(e);
+      });
+    },
+    getRequestsList ({commit}) {
+      getRequestsList.then(result => {
+        commit('registerRequestsList', result);
       }).catch(e => {
         console.log(e);
       });
