@@ -26,6 +26,7 @@ contract Treaties {
     mapping (address => uint) public refunds;
 
     struct Request {
+        uint8 id;
         uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat), 4 - new percentage
         address beneficiary;
         string treatyHash;
@@ -37,7 +38,7 @@ contract Treaties {
         address[] ownersConfirm;
     }
 
-    uint public requestsCount = 0;
+    uint8 public requestsCount = 0;
     Request[] public requests;
 
     modifier onlyOwner() {
@@ -78,8 +79,8 @@ contract Treaties {
     function createTreatyRequest(uint8 _rType, string _treatyHash, uint _tokensAmount) public {
         require(_rType <= 1);
 
-        requestsCount++;
         requests.push(Request({
+            id: requestsCount,
             rType: _rType,
             beneficiary: msg.sender,
             treatyHash: _treatyHash,
@@ -89,6 +90,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, 0, 0, requests.length - 1);
     }
@@ -96,9 +98,9 @@ contract Treaties {
     function createEthInvestorRequest(uint _tokensAmount) public payable {
         assert(msg.value > 0);
 
-        requestsCount++;
         requests.push(Request({
             rType: 2,
+            id: requestsCount,
             beneficiary: msg.sender,
             treatyHash: '',
             tokensAmount: _tokensAmount,
@@ -107,6 +109,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(2, msg.sender, "", _tokensAmount, msg.value, 0, requests.length - 1);
     }
@@ -122,9 +125,9 @@ contract Treaties {
     }
 
     function createFiatInvestorRequest(uint _tokensAmount) public {
-        requestsCount++;
         requests.push(Request({
             rType: 3,
+            id: requestsCount,
             beneficiary: msg.sender,
             treatyHash: '',
             tokensAmount: _tokensAmount,
@@ -133,6 +136,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(3, msg.sender, "", _tokensAmount, 0, 0, requests.length - 1);
     }
@@ -140,9 +144,9 @@ contract Treaties {
     function createPercentageRequest(uint _percentage) public onlyOwner {
         require(_percentage <= 100);
 
-        requestsCount++;
         requests.push(Request({
             rType: 4,
+            id: requestsCount,
             beneficiary: msg.sender,
             treatyHash: '',
             tokensAmount: 0,
@@ -151,6 +155,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(4, msg.sender, "", 0, 0, _percentage, requests.length - 1);
     }
