@@ -5,8 +5,9 @@ let state = {
     balance: null,
     error: null
   },
-  contractInstance: null,
   requestsList: null,
+  contractInstance: null,
+  request: {}
 };
 
 export default state

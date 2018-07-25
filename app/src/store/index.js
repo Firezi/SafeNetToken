@@ -4,6 +4,7 @@ import state from './state'
 import getWeb3 from '../util/getWeb3'
 import getContract from '../util/getContract'
 import getRequestsList from '../util/getRequestsList'
+import getRequest from '../util/getRequest'
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
@@ -25,7 +26,11 @@ export const store = new Vuex.Store({
     },
     registerRequestsList (state, payload) {
       console.log('Requests list: ', payload);
-      state.requestsList = () => payload;
+      state.requestsList = payload;
+    },
+    registerRequest (state, payload) {
+      console.log('Request: ', payload);
+      state.request = payload;
     }
   },
   actions: {
@@ -49,6 +54,13 @@ export const store = new Vuex.Store({
       }).catch(e => {
         console.log(e);
       });
+    },
+    getRequest ({commit}, requestId) {
+      getRequest(requestId).then(result => {
+        commit('registerRequest', result);
+      }).catch(e => {
+        console.log(e);
+      })
     }
   }
 });
