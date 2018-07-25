@@ -31,7 +31,6 @@ export default {
     }
   },
   beforeCreate() {
-    console.log('getRequestsList Action dispatched');
     this.$store.dispatch('getRequestsList');
   },
 }
