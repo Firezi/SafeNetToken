@@ -4,8 +4,8 @@
     <ul>
       <li v-for="request in $store.state.requestsList">
         <div>
-          <h3>Request #{{ request.id }}</h3>
-          <h4>{{ types[request.rType] }}</h4>
+          <router-link :to="{ name: 'request', params: {requestId: request.id} }">Request #{{ request.id }}</router-link>
+          <p>{{ types[request.rType] }}</p>
           <p>{{ request.beneficiary }}</p>
           <p>{{ (request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
           <p v-if="request.rType == 2"> {{ (request.ethAmount / 10**18).toFixed(3) }} Eth</p>
