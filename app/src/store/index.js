@@ -56,10 +56,13 @@ export const store = new Vuex.Store({
       });
     },
     getRequestAction ({commit}, requestId) {
-      getRequest(requestId).then(result => {
-        commit('registerRequest', result);
-      }).catch(e => {
-        console.log(e);
+      return new Promise(function (resolve, reject) {
+        getRequest(requestId).then(result => {
+          commit('registerRequest', result);
+          resolve();
+        }).catch(e => {
+          console.log(e);
+        })
       })
     }
   }

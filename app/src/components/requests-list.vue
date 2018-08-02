@@ -9,7 +9,6 @@
           <p>{{ request.beneficiary }}</p>
           <p>{{ (request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
           <p v-if="request.rType == 2"> {{ (request.ethAmount / 10**18).toFixed(3) }} Eth</p>
-          <p v-if="request.rType < 2">Treaty: {{ request.treatyHash }}</p>
           <p>{{ request.isConfirmed == 2 ? 'Confirmed' : 'Not confirmed' }}</p>
         </div>
       </li>

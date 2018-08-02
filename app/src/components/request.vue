@@ -5,7 +5,7 @@
       <p>{{ $store.state.request.beneficiary }}</p>
       <p>{{ ($store.state.request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
       <p v-if="$store.state.request.rType == 2"> {{ ($store.state.request.ethAmount / 10**18).toFixed(3) }} Eth</p>
-      <p v-if="$store.state.request.rType < 2">Treaty: {{ $store.state.request.treatyHash }}</p>
+      <pre v-if="$store.state.request.rType < 2">{{ treatyText }}</pre>
       <p>{{ $store.state.request.isConfirmed == 2 ? 'Confirmed' : 'Not confirmed' }}</p>
       <p>ConfirmedTokens: {{ ($store.state.request.tokensConfirmed / 10**18).toFixed(2) + ' / ' +  ($store.state.request.tokensInOwners / 10**18).toFixed(2) + ' SNT'}}</p>
       <button v-if="$store.state.request.isConfirmed == 0" v-on:click="transact()">Confirm</button>
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import ipfs from '../ipfs.js'
   export default {
     name: "request",
     data: function () {
@@ -23,17 +24,27 @@
           'Eth investor',
           'Fiat investor '
         ],
+        treatyText: 'Loading...'
       }
     },
     beforeCreate() {
       this.$store.dispatch('registerWeb3Action');
-      this.$store.dispatch('getRequestAction', this.$route.params.requestId);
+      let comp = this;
+      this.$store.dispatch('getRequestAction', this.$route.params.requestId).then((res) => {
+        ipfs.cat(this.$store.state.request.treatyHash, function(error, file) {
+          if (error || !file) {
+            console.log(error);
+          } else {
+            comp.treatyText = file.toString('utf8');
+          }
+        })
+      });
       this.$store.dispatch('getContractInstanceAction');
     },
     methods: {
       transact: function () {
         this.$store.state.contractInstance().methods.confirmRequest(this.$store.state.request.id).send({
-          from:this.$store.state.web3.coinbase
+          from: this.$store.state.web3.coinbase
         });
       }
     }
