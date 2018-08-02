@@ -46,8 +46,8 @@ export default {
     }
   },
   beforeCreate() {
-    this.$store.dispatch('registerWeb3');
-    this.$store.dispatch('getContractInstance');
+    this.$store.dispatch('registerWeb3Action');
+    this.$store.dispatch('getContractInstanceAction');
   },
   computed: {
     isValid() {

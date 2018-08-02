@@ -31,7 +31,7 @@ export default {
     }
   },
   beforeCreate() {
-    this.$store.dispatch('getRequestsList');
+    this.$store.dispatch('getRequestsListAction');
   },
 }
 </script>

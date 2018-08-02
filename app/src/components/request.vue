@@ -26,9 +26,9 @@
       }
     },
     beforeCreate() {
-      this.$store.dispatch('registerWeb3');
-      this.$store.dispatch('getRequest', this.$route.params.requestId);
-      this.$store.dispatch('getContractInstance');
+      this.$store.dispatch('registerWeb3Action');
+      this.$store.dispatch('getRequestAction', this.$route.params.requestId);
+      this.$store.dispatch('getContractInstanceAction');
     },
     methods: {
       transact: function () {

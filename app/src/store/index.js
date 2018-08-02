@@ -34,28 +34,28 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    registerWeb3 ({commit}) {
+    registerWeb3Action ({commit}) {
       getWeb3.then(result => {
         commit('registerWeb3Instance', result);
       }).catch(e => {
         console.log('error in action registerWeb3', e);
       })
     },
-    getContractInstance ({commit}) {
+    getContractInstanceAction ({commit}) {
       getContract.then(result => {
         commit('registerContractInstance', result);
       }).catch(e => {
         console.log(e);
       });
     },
-    getRequestsList ({commit}) {
+    getRequestsListAction ({commit}) {
       getRequestsList.then(result => {
         commit('registerRequestsList', result);
       }).catch(e => {
         console.log(e);
       });
     },
-    getRequest ({commit}, requestId) {
+    getRequestAction ({commit}, requestId) {
       getRequest(requestId).then(result => {
         commit('registerRequest', result);
       }).catch(e => {
