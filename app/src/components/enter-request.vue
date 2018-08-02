@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import ipfs from '../ipfs.js'
 export default {
   name: 'enter-request',
   data: function () {
@@ -66,9 +67,20 @@ export default {
     transact: function () {
       let tokensWei = (this.tokensAmount * 10 ** 9).toString() + "000000000";
       if (this.selectedType === 1 || this.selectedType === 2) {
-        this.$store.state.contractInstance().methods.createTreatyRequest(this.selectedType - 1, this.treatyText, tokensWei).send({
-          from:this.$store.state.web3.coinbase
-        });
+        console.log('waiting...');
+        ipfs.add(Buffer(this.treatyText), { onlyHash: true }, (error, result) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('ipfsHash:', result[0].hash);
+            this.$store.state.contractInstance().methods.createTreatyRequest(this.selectedType - 1, result[0].hash, tokensWei).send({
+              from:this.$store.state.web3.coinbase
+            });
+            let text = this.treatyText;
+            this.clear();
+            ipfs.add(Buffer(text));
+          }
+        })
       }
       if (this.selectedType === 3) {
         let wei = (this.ethAmount * 10 ** 9).toString() + "000000000";
@@ -76,12 +88,16 @@ export default {
           from:this.$store.state.web3.coinbase,
           value: wei
         });
+        this.clear();
       }
       if (this.selectedType === 4) {
         this.$store.state.contractInstance().methods.createFiatInvestorRequest(tokensWei).send({
           from:this.$store.state.web3.coinbase
         });
+        this.clear();
       }
+    },
+    clear: function () {
       this.selectedType = 0;
       this.tokensAmount = '';
       this.ethAmount = '';
