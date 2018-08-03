@@ -271,4 +271,22 @@ contract Treaties {
             tokensInOwners += token.balanceOf(owners[i]);
         }
     }
+
+    function checkOwner(address _addr) public view returns (bool) {
+        for (uint i = 0; i < owners.length; i++) {
+            if (_addr == owners[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkRequestConfirmedBy(uint id, address _addr) public view returns (bool) {
+        for (uint i = 0; i < requests[id].ownersConfirm.length; i++) {
+            if (_addr == requests[id].ownersConfirm[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
