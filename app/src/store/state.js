@@ -7,7 +7,9 @@ let state = {
   },
   requestsList: null,
   contractInstance: null,
-  request: {}
+  request: {},
+  isOwner: null,
+  isConfirmedByUser: null
 };
 
 export default state

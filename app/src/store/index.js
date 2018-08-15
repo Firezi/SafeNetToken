@@ -5,6 +5,7 @@ import getWeb3 from '../util/getWeb3'
 import getContract from '../util/getContract'
 import getRequestsList from '../util/getRequestsList'
 import getRequest from '../util/getRequest'
+import getRequestConfirmStatus from '../util/getRequestConfirmStatus'
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
@@ -31,14 +32,21 @@ export const store = new Vuex.Store({
     registerRequest (state, payload) {
       console.log('Request: ', payload);
       state.request = payload;
+    },
+    registerRequestConfirmStatus (state, payload) {
+      state.isOwner = payload.isOwner;
+      state.isConfirmedByUser = payload.isConfirmedByUser;
     }
   },
   actions: {
     registerWeb3Action ({commit}) {
-      getWeb3.then(result => {
-        commit('registerWeb3Instance', result);
-      }).catch(e => {
-        console.log('error in action registerWeb3', e);
+      return new Promise(function (resolve, reject) {
+        getWeb3.then(result => {
+          commit('registerWeb3Instance', result);
+          resolve();
+        }).catch(e => {
+          console.log('error in action registerWeb3', e);
+        })
       })
     },
     getContractInstanceAction ({commit}) {
@@ -46,23 +54,28 @@ export const store = new Vuex.Store({
         commit('registerContractInstance', result);
       }).catch(e => {
         console.log(e);
-      });
+      })
     },
     getRequestsListAction ({commit}) {
       getRequestsList.then(result => {
         commit('registerRequestsList', result);
       }).catch(e => {
         console.log(e);
-      });
+      })
     },
-    getRequestAction ({commit}, requestId) {
+    getRequestAction ({commit}, payload) {
       return new Promise(function (resolve, reject) {
-        getRequest(requestId).then(result => {
+        getRequest(payload).then(result => {
           commit('registerRequest', result);
           resolve();
         }).catch(e => {
           console.log(e);
         })
+      })
+    },
+    getRequestConfirmStatusAction ({commit}, payload) {
+      getRequestConfirmStatus(payload.address, payload.requestId).then(result => {
+        commit('registerRequestConfirmStatus', result);
       })
     }
   }
