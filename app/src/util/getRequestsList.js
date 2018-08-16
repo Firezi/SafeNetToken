@@ -1,8 +1,8 @@
-import getContract from './getContract'
+import getTreatiesContract from './getTreatiesContract'
 
 
 let getRequestsList = new Promise(function(resolve, reject) {
-  getContract.then(result => {
+  getTreatiesContract.then(result => {
     result.methods.requestsCount().call().then(len => {
       let promisesList = [];
       for (let i = 0; i < len; i++) {
@@ -14,7 +14,7 @@ let getRequestsList = new Promise(function(resolve, reject) {
     })
   })
 }).catch(e => {
-  console.log(e);
+  console.log('Error in get request list:', e);
 });
 
 export default getRequestsList;

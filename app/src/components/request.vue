@@ -28,25 +28,25 @@ import ipfs from '../ipfs.js'
       }
     },
     beforeCreate() {
-      this.$store.dispatch('registerWeb3Action').then(() => {
-        this.$store.dispatch('getRequestConfirmStatusAction', {address: this.$store.state.web3.coinbase, requestId: this.$route.params.requestId});
-      })
+      this.$store.dispatch('getUser');
       let comp = this;
-      this.$store.dispatch('getRequestAction', this.$route.params.requestId).then((res) => {
-        ipfs.cat(this.$store.state.request.treatyHash, function(error, file) {
-          if (error || !file) {
-            console.log(error);
-          } else {
-            comp.treatyText = file.toString('utf8');
-          }
-        })
+      this.$store.dispatch('getRequest', this.$route.params.requestId).then((res) => {
+        if (res.rType == 0 || res.rType == 1) {
+          ipfs.cat(this.$store.state.request.treatyHash, function(error, file) {
+            if (error || !file) {
+              console.log(error);
+            } else {
+              comp.treatyText = file.toString('utf8');
+            }
+          })
+        }
       });
-      this.$store.dispatch('getContractInstanceAction');
+      this.$store.dispatch('getTreatiesContract');
     },
     methods: {
       transact: function () {
-        this.$store.state.contractInstance().methods.confirmRequest(this.$store.state.request.id).send({
-          from: this.$store.state.web3.coinbase
+        this.$store.state.contractInstance.methods.confirmRequest(this.$store.state.request.id).send({
+          from: this.$store.state.user.address
         });
       }
     }

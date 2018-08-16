@@ -46,8 +46,8 @@ export default {
     }
   },
   beforeCreate() {
-    this.$store.dispatch('registerWeb3Action');
-    this.$store.dispatch('getContractInstanceAction');
+    this.$store.dispatch('getUser');
+    this.$store.dispatch('getTreatiesContract');
   },
   computed: {
     isValid() {
@@ -73,8 +73,8 @@ export default {
             console.log(error);
           } else {
             console.log('ipfsHash:', result[0].hash);
-            this.$store.state.contractInstance().methods.createTreatyRequest(this.selectedType - 1, result[0].hash, tokensWei).send({
-              from:this.$store.state.web3.coinbase
+            this.$store.state.treatiesContract().methods.createTreatyRequest(this.selectedType - 1, result[0].hash, tokensWei).send({
+              from:this.$store.state.user.address
             });
             let text = this.treatyText;
             this.clear();
@@ -84,15 +84,15 @@ export default {
       }
       if (this.selectedType === 3) {
         let wei = (this.ethAmount * 10 ** 9).toString() + "000000000";
-        this.$store.state.contractInstance().methods.createEthInvestorRequest(tokensWei).send({
-          from:this.$store.state.web3.coinbase,
+        this.$store.state.treatiesContract().methods.createEthInvestorRequest(tokensWei).send({
+          from:this.$store.state.user.address,
           value: wei
         });
         this.clear();
       }
       if (this.selectedType === 4) {
-        this.$store.state.contractInstance().methods.createFiatInvestorRequest(tokensWei).send({
-          from:this.$store.state.web3.coinbase
+        this.$store.state.treatiesContract().methods.createFiatInvestorRequest(tokensWei).send({
+          from:this.$store.state.user.address
         });
         this.clear();
       }
