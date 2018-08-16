@@ -8,7 +8,8 @@
     <pre v-if="$store.state.request.rType < 2">{{ treatyText }}</pre>
     <p>{{ $store.state.request.isConfirmed == 2 ? 'Confirmed' : 'Not confirmed' }}</p>
     <p>ConfirmedTokens: {{ ($store.state.request.tokensConfirmed / 10**18).toFixed(2) + ' / ' +  ($store.state.request.tokensInOwners / 10**18).toFixed(2) + ' SNT'}}</p>
-    <button v-if="$store.state.request.isConfirmed == 0" v-on:click="transact()">Confirm</button>
+    <button v-if="rejectButton">Reject confirmation</button>
+    <button v-if="acceptButton" v-on:click="acceptRequest()">Confirm</button>
   </div>
 </template>
 
@@ -43,9 +44,22 @@ import ipfs from '../ipfs.js'
       });
       this.$store.dispatch('getTreatiesContract');
     },
+    computed: {
+      acceptButton () {
+        return this.$store.state.user.group == 1 && !this.$store.state.request.isConfimed && !this.$store.state.request.isConfirmedByUser;
+      },
+      rejectButton () {
+        return this.$store.state.user.group == 1 && !this.$store.state.request.isConfimed && this.$store.state.request.isConfirmedByUser;
+      }
+    },
     methods: {
-      transact: function () {
-        this.$store.state.contractInstance.methods.confirmRequest(this.$store.state.request.id).send({
+      acceptRequest: function () {
+        this.$store.state.treatiesContract().methods.confirmRequest(this.$store.state.request.id).send({
+          from: this.$store.state.user.address
+        });
+      },
+      rejectRequest: function () {
+        this.$store.state.treatiesContract().methods.rejectRequest(this.$store.state.request.id).send({
           from: this.$store.state.user.address
         });
       }
