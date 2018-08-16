@@ -4,6 +4,7 @@ import EnterRequest from '@/components/enter-request'
 import RequestsList from '@/components/requests-list'
 import Request from  '@/components/request'
 import Main from '@/components/main'
+import UserPage from '@/components/user-page'
 
 Vue.use(Router);
 
@@ -29,6 +30,11 @@ export default new Router({
       path: '/request/:requestId',
       name: 'request',
       component: Request
+    },
+    {
+      path: '/user',
+      name: 'user-page',
+      component: UserPage
     }
   ]
 })
