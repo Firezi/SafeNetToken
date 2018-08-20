@@ -6,10 +6,11 @@
     <p>{{ ($store.state.request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
     <p v-if="$store.state.request.rType == 2"> {{ ($store.state.request.ethAmount / 10**18).toFixed(3) }} Eth</p>
     <pre v-if="$store.state.request.rType < 2">{{ treatyText }}</pre>
-    <p>{{ $store.state.request.isConfirmed == 2 ? 'Confirmed' : 'Not confirmed' }}</p>
+    <p>{{ status[$store.state.request.isConfirmed] }}</p>
     <p>ConfirmedTokens: {{ ($store.state.request.tokensConfirmed / 10**18).toFixed(2) + ' / ' +  ($store.state.request.tokensInOwners / 10**18).toFixed(2) + ' SNT'}}</p>
-    <button v-if="rejectButton">Reject confirmation</button>
+    <button v-if="rejectButton" v-on:click="rejectRequest()">Reject confirmation</button>
     <button v-if="acceptButton" v-on:click="acceptRequest()">Confirm</button>
+    <button v-if="removeButton" v-on:click="removeRequest()">Remove request and return funds</button>
   </div>
 </template>
 
@@ -24,6 +25,11 @@ import ipfs from '../ipfs.js'
           'Team',
           'Eth investor',
           'Fiat investor '
+        ],
+        status: [
+          'Not confirmed',
+          'Declined by Investor',
+          'Confirmed'
         ],
         treatyText: 'Loading...'
       }
@@ -46,10 +52,14 @@ import ipfs from '../ipfs.js'
     },
     computed: {
       acceptButton () {
-        return this.$store.state.user.group == 1 && !this.$store.state.request.isConfimed && !this.$store.state.request.isConfirmedByUser;
+        return this.$store.state.user.group == 1 && this.$store.state.request.isConfirmed == 0 && !this.$store.state.request.isConfirmedByUser;
       },
       rejectButton () {
-        return this.$store.state.user.group == 1 && !this.$store.state.request.isConfimed && this.$store.state.request.isConfirmedByUser;
+        return this.$store.state.user.group == 1 && this.$store.state.request.isConfirmed == 0 && this.$store.state.request.isConfirmedByUser;
+      },
+      removeButton () {
+        return this.$store.state.request.rType == 2 && this.$store.state.request.isConfirmed == 0
+          && this.$store.state.request.beneficiary.toLowerCase() == this.$store.state.user.address.toLowerCase();
       }
     },
     methods: {
@@ -60,6 +70,11 @@ import ipfs from '../ipfs.js'
       },
       rejectRequest: function () {
         this.$store.state.treatiesContract().methods.rejectRequest(this.$store.state.request.id).send({
+          from: this.$store.state.user.address
+        });
+      },
+      removeRequest: function() {
+        this.$store.state.treatiesContract().methods.removeEthInvestorRequest(this.$store.state.request.id).send({
           from: this.$store.state.user.address
         });
       }

@@ -13,7 +13,7 @@
           <p>{{ request.beneficiary }}</p>
           <p>{{ (request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
           <p v-if="request.rType == 2"> {{ (request.ethAmount / 10**18).toFixed(3) }} Eth</p>
-          <p>{{ request.isConfirmed == 2 ? 'Confirmed' : 'Not confirmed' }}</p>
+          <p>{{ status[request.isConfirmed] }}</p>
         </div>
       </li>
     </ul>
@@ -41,6 +41,11 @@
           'Team',
           'Eth investor',
           'Fiat investor '
+        ],
+        status: [
+          'Not confirmed',
+          'Declined by Investor',
+          'Confirmed'
         ]
       }
     },
