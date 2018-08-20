@@ -46,9 +46,14 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getRequestsList ({commit}) {
+    getRequestsList ({commit}, payload) {
       return new Promise(function (resolve, reject) {
         getRequestsList.then(result => {
+          if (payload) {
+            result = result.filter(request => {
+              return request.beneficiary.toLowerCase() === payload.toLowerCase();
+            })
+          }
           commit('registerRequestsList', result);
           resolve(result);
         })
@@ -62,7 +67,7 @@ export const store = new Vuex.Store({
         })
       })
     },
-    getTreatiesContract ({commit}, payload) {
+    getTreatiesContract ({commit}) {
       return new Promise(function (resolve, reject) {
         getTreatiesContract.then(result => {
           commit('registerTreatiesContract', result);
