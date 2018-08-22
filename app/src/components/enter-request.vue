@@ -1,6 +1,7 @@
 <template>
   <div>
-    <form id="createRequestForm">
+    <h1>Create Request</h1>
+    <!--<form id="createRequestForm">-->
       <p>Choose the role:</p>
       <select v-model="selectedType">
         <option v-for="type in types" v-bind:value="type.value">
@@ -22,11 +23,12 @@
       <p v-if="selectedType > 0">
         <button :disabled=!isValid v-on:click="transact()">Send Transaction</button>
       </p>
-    </form>
+    <!--</form>-->
   </div>
 </template>
 
 <script>
+import ipfs from '../ipfs.js'
 export default {
   name: 'enter-request',
   data: function () {
@@ -44,10 +46,8 @@ export default {
     }
   },
   beforeCreate() {
-    console.log('registerWeb3 Action dispatched');
-    this.$store.dispatch('registerWeb3');
-    console.log('dispatching getContractInstance');
-    this.$store.dispatch('getContractInstance');
+    this.$store.dispatch('getUser');
+    this.$store.dispatch('getTreatiesContract');
   },
   computed: {
     isValid() {
@@ -67,22 +67,37 @@ export default {
     transact: function () {
       let tokensWei = (this.tokensAmount * 10 ** 9).toString() + "000000000";
       if (this.selectedType === 1 || this.selectedType === 2) {
-        this.$store.state.contractInstance().methods.createTreatyRequest(this.selectedType - 1, this.treatyText, tokensWei).send({
-          from:this.$store.state.web3.coinbase
-        });
+        console.log('waiting...');
+        ipfs.add(Buffer(this.treatyText), { onlyHash: true }, (error, result) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('ipfsHash:', result[0].hash);
+            this.$store.state.treatiesContract().methods.createTreatyRequest(this.selectedType - 1, result[0].hash, tokensWei).send({
+              from:this.$store.state.user.address
+            });
+            let text = this.treatyText;
+            this.clear();
+            ipfs.add(Buffer(text));
+          }
+        })
       }
       if (this.selectedType === 3) {
         let wei = (this.ethAmount * 10 ** 9).toString() + "000000000";
-        this.$store.state.contractInstance().methods.createEthInvestorRequest(tokensWei).send({
-          from:this.$store.state.web3.coinbase,
+        this.$store.state.treatiesContract().methods.createEthInvestorRequest(tokensWei).send({
+          from:this.$store.state.user.address,
           value: wei
         });
+        this.clear();
       }
       if (this.selectedType === 4) {
-        this.$store.state.contractInstance().methods.createFiatInvestorRequest(tokensWei).send({
-          from:this.$store.state.web3.coinbase
+        this.$store.state.treatiesContract().methods.createFiatInvestorRequest(tokensWei).send({
+          from:this.$store.state.user.address
         });
+        this.clear();
       }
+    },
+    clear: function () {
       this.selectedType = 0;
       this.tokensAmount = '';
       this.ethAmount = '';

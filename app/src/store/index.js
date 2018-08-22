@@ -1,42 +1,79 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import state from './state'
-import getWeb3 from '../util/getWeb3'
-import getContract from '../util/getContract'
+import getUser from '../util/getUser'
+import getRequestsList from '../util/getRequestsList'
+import getRequest from '../util/getRequest'
+import getTreatiesContract from "../util/getTreatiesContract";
+
 
 Vue.use(Vuex);
 export const store = new Vuex.Store({
   strict: true,
-  state,
-  mutations: {
-    registerWeb3Instance (state, payload) {
-      console.log('registerWeb3instance Mutation being executed', payload);
-      let result = payload;
-      let web3Copy = state.web3;
-      web3Copy.coinbase = result.coinbase;
-      web3Copy.balance = parseInt(result.balance, 10);
-      web3Copy.web3Instance = result.web3;
-      state.web3 = web3Copy;
+  state: {
+    treatiesContract: null,
+    user: {
+      // address: null,
+      // group: null,
+      // balance: null
     },
-    registerContractInstance (state, payload) {
-      console.log('Treaty contract instance: ', payload);
-      state.contractInstance = () => payload;
+    requestsList: null,
+    request: {},
+  },
+  mutations: {
+    registerUser (state, payload) {
+      console.log('Register user:', payload);
+      state.user = payload;
+    },
+    registerRequestsList (state, payload) {
+      console.log('Requests list: ', payload);
+      state.requestsList = payload;
+    },
+    registerRequest (state, payload) {
+      console.log('Request: ', payload);
+      state.request = payload;
+    },
+    registerTreatiesContract (state, payload) {
+      console.log('Treaties instance: ', payload);
+      state.treatiesContract = () => payload;
     }
   },
   actions: {
-    registerWeb3 ({commit}) {
-      getWeb3.then(result => {
-        commit('registerWeb3Instance', result);
-      }).catch(e => {
-        console.log('error in action registerWeb3', e);
+    getUser ({commit}) {
+      return new Promise(function (resolve, reject) {
+        getUser.then(result => {
+          commit('registerUser', result);
+          resolve(result);
+        })
       })
     },
-    getContractInstance ({commit}) {
-      getContract.then(result => {
-        commit('registerContractInstance', result);
-      }).catch(e => {
-        console.log(e);
-      });
+    getRequestsList ({commit}, payload) {
+      return new Promise(function (resolve, reject) {
+        getRequestsList.then(result => {
+          if (payload) {
+            result = result.filter(request => {
+              return request.beneficiary.toLowerCase() === payload.toLowerCase();
+            })
+          }
+          commit('registerRequestsList', result);
+          resolve(result);
+        })
+      })
+    },
+    getRequest ({commit}, payload) {
+      return new Promise(function (resolve, reject) {
+        getRequest(payload).then(result => {
+          commit('registerRequest', result);
+          resolve(result);
+        })
+      })
+    },
+    getTreatiesContract ({commit}) {
+      return new Promise(function (resolve, reject) {
+        getTreatiesContract.then(result => {
+          commit('registerTreatiesContract', result);
+          resolve(result);
+        })
+      })
     }
   }
 });

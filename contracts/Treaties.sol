@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 import "./SafeMath.sol";
 import "./SafeNetToken.sol";
@@ -26,6 +26,7 @@ contract Treaties {
     mapping (address => uint) public refunds;
 
     struct Request {
+        uint8 id;
         uint8 rType; // 0 - owner, 1 - team, 2 - investor(eth), 3 - investor(fiat), 4 - new percentage
         address beneficiary;
         string treatyHash;
@@ -37,6 +38,7 @@ contract Treaties {
         address[] ownersConfirm;
     }
 
+    uint8 public requestsCount = 0;
     Request[] public requests;
 
     modifier onlyOwner() {
@@ -52,7 +54,7 @@ contract Treaties {
     event RequestDeclined(uint id);
     event RefundsCalculated();
 
-    function Treaties(address _wallet, SafeNetToken _token) public {
+    constructor(address _wallet, SafeNetToken _token) public {
         creator = msg.sender;
         token = _token;
         wallet = _wallet;
@@ -78,6 +80,7 @@ contract Treaties {
         require(_rType <= 1);
 
         requests.push(Request({
+            id: requestsCount,
             rType: _rType,
             beneficiary: msg.sender,
             treatyHash: _treatyHash,
@@ -87,6 +90,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(_rType, msg.sender, _treatyHash, _tokensAmount, 0, 0, requests.length - 1);
     }
@@ -96,6 +100,7 @@ contract Treaties {
 
         requests.push(Request({
             rType: 2,
+            id: requestsCount,
             beneficiary: msg.sender,
             treatyHash: '',
             tokensAmount: _tokensAmount,
@@ -104,6 +109,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(2, msg.sender, "", _tokensAmount, msg.value, 0, requests.length - 1);
     }
@@ -121,6 +127,7 @@ contract Treaties {
     function createFiatInvestorRequest(uint _tokensAmount) public {
         requests.push(Request({
             rType: 3,
+            id: requestsCount,
             beneficiary: msg.sender,
             treatyHash: '',
             tokensAmount: _tokensAmount,
@@ -129,6 +136,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(3, msg.sender, "", _tokensAmount, 0, 0, requests.length - 1);
     }
@@ -138,6 +146,7 @@ contract Treaties {
 
         requests.push(Request({
             rType: 4,
+            id: requestsCount,
             beneficiary: msg.sender,
             treatyHash: '',
             tokensAmount: 0,
@@ -146,6 +155,7 @@ contract Treaties {
             isConfirmed: 0,
             ownersConfirm: new address[](0)
             }));
+        requestsCount++;
 
         emit NewRequest(4, msg.sender, "", 0, 0, _percentage, requests.length - 1);
     }
@@ -247,5 +257,46 @@ contract Treaties {
         uint refund = refunds[msg.sender];
         refunds[msg.sender] = 0;
         assert(msg.sender.send(refund));
+    }
+
+    function getRequestConfirmation(uint id) public view returns (uint tokensConfirmed, uint tokensInOwners) {
+        tokensConfirmed = 0;
+        for (uint i = 0; i < requests[id].ownersConfirm.length; i++) {
+            assert(requests[id].ownersConfirm[i] != msg.sender);
+            tokensConfirmed += token.balanceOf(requests[id].ownersConfirm[i]);
+        }
+
+        tokensInOwners = 0;
+        for (i = 0; i < owners.length; i++) {
+            tokensInOwners += token.balanceOf(owners[i]);
+        }
+    }
+
+    function checkRequestConfirmedBy(uint id, address _addr) public view returns (bool) {
+        for (uint i = 0; i < requests[id].ownersConfirm.length; i++) {
+            if (_addr == requests[id].ownersConfirm[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getGroup(address _addr) public view returns (uint) {
+        for (uint i = 0; i < owners.length; i++) {
+            if (_addr == owners[i]) {
+                return 1;
+            }
+        }
+        for (i = 0; i < teams.length; i++) {
+            if (_addr == teams[i]) {
+                return 2;
+            }
+        }
+        for (i = 0; i < investors.length; i++) {
+            if (_addr == investors[i]) {
+                return 3;
+            }
+        }
+        return 0;
     }
 }
