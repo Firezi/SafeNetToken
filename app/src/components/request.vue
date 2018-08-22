@@ -3,8 +3,9 @@
     <h1>Request #{{ $route.params.requestId }}</h1>
     <h4>{{ types[$store.state.request.rType] }}</h4>
     <p>{{ $store.state.request.beneficiary }}</p>
-    <p>{{ ($store.state.request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
+    <p v-if="$store.state.request.rType < 4">{{ ($store.state.request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
     <p v-if="$store.state.request.rType == 2"> {{ ($store.state.request.ethAmount / 10**18).toFixed(3) }} Eth</p>
+    <p v-if="$store.state.request.rType == 4">{{ $store.state.request.percentage }}%</p>
     <pre v-if="$store.state.request.rType < 2">{{ treatyText }}</pre>
     <p>{{ status[$store.state.request.isConfirmed] }}</p>
     <p>ConfirmedTokens: {{ ($store.state.request.tokensConfirmed / 10**18).toFixed(2) + ' / ' +  ($store.state.request.tokensInOwners / 10**18).toFixed(2) + ' SNT'}}</p>
@@ -24,7 +25,8 @@ import ipfs from '../ipfs.js'
           'Owner',
           'Team',
           'Eth investor',
-          'Fiat investor '
+          'Fiat investor ',
+          'Percentage change'
         ],
         status: [
           'Not confirmed',

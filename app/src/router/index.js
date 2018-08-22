@@ -5,6 +5,7 @@ import RequestsList from '@/components/requests-list'
 import Request from  '@/components/request'
 import Main from '@/components/main'
 import UserPage from '@/components/user-page'
+import PercentageRequest from '@/components/percentage-request'
 
 Vue.use(Router);
 
@@ -35,6 +36,11 @@ export default new Router({
       path: '/user',
       name: 'user-page',
       component: UserPage
+    },
+    {
+      path: '/percentage',
+      name: 'percentage-request',
+      component: PercentageRequest
     }
   ]
 })
