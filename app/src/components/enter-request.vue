@@ -48,6 +48,7 @@ export default {
   beforeCreate() {
     this.$store.dispatch('getUser');
     this.$store.dispatch('getTreatiesContract');
+    this.$store.dispatch('getMetamaskStatus');
   },
   computed: {
     isValid() {

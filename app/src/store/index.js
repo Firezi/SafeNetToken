@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import getUser from '../util/getUser'
 import getRequestsList from '../util/getRequestsList'
 import getRequest from '../util/getRequest'
-import getTreatiesContract from "../util/getTreatiesContract";
+import getTreatiesContract from '../util/getTreatiesContract';
+import getMetamaskStatus from '../util/getMetamaskStatus'
 
 
 Vue.use(Vuex);
@@ -71,6 +72,13 @@ export const store = new Vuex.Store({
       return new Promise(function (resolve, reject) {
         getTreatiesContract.then(result => {
           commit('registerTreatiesContract', result);
+          resolve(result);
+        })
+      })
+    },
+    getMetamaskStatus ({commit}) {
+      return new Promise(function (resolve, reject) {
+        getMetamaskStatus.then(result => {
           resolve(result);
         })
       })
