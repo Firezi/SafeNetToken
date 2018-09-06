@@ -8,11 +8,15 @@
         </option>
       </b-form-select>
     </b-form-group>
-    <b-form-group v-if="selectedType > 0" label="SNT tokens amount:" label-for="tokensAmount" description="SNT">
-      <b-form-input id="tokensAmount" v-model="tokensAmount" placeholder="100.0"></b-form-input>
+    <b-form-group v-if="selectedType > 0" label="SNT tokens amount:" label-for="tokensAmount">
+      <b-input-group append="SNT">
+        <b-form-input id="tokensAmount" v-model="tokensAmount" placeholder="100.0"></b-form-input>
+      </b-input-group>
     </b-form-group>
-    <b-form-group v-if="selectedType == 3" label="Eth amount:" label-for="ethAmount" description="ETH">
-      <b-form-input id="ethAmount" v-model="ethAmount" placeholder="100.0"></b-form-input>
+    <b-form-group v-if="selectedType == 3" label="Eth amount:" label-for="ethAmount">
+      <b-input-group append="ETH">
+        <b-form-input id="ethAmount" v-model="ethAmount" placeholder="100.0"></b-form-input>
+      </b-input-group>
     </b-form-group>
     <b-form-group v-if="selectedType == 1 || selectedType == 2" label="Treaty text:" label-for="treatyText">
       <b-form-textarea id="treatyText" v-model="treatyText" :rows="4" placeholder="Enter here"></b-form-textarea>
