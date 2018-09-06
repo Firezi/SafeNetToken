@@ -18,6 +18,11 @@
       }
     },
     beforeCreate() {
+      this.$store.dispatch('getMetamaskStatus').then(result => {
+        if (!result) {
+          this.$router.push({ name: 'download-metamask' });
+        }
+      });
       this.$store.dispatch('getUser');
       this.$store.dispatch('getTreatiesContract').then(instance => {
         instance.methods.walletPercentage().call().then(result => {

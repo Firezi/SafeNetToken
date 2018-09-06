@@ -37,6 +37,11 @@ import ipfs from '../ipfs.js'
       }
     },
     beforeCreate() {
+      this.$store.dispatch('getMetamaskStatus').then(result => {
+        if (!result) {
+          this.$router.push({ name: 'download-metamask' });
+        }
+      });
       this.$store.dispatch('getUser');
       let comp = this;
       this.$store.dispatch('getRequest', this.$route.params.requestId).then((res) => {

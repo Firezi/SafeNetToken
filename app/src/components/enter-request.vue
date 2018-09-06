@@ -46,9 +46,13 @@ export default {
     }
   },
   beforeCreate() {
+    this.$store.dispatch('getMetamaskStatus').then(result => {
+      if (!result) {
+        this.$router.push({ name: 'download-metamask' });
+      }
+    });
     this.$store.dispatch('getUser');
     this.$store.dispatch('getTreatiesContract');
-    this.$store.dispatch('getMetamaskStatus');
   },
   computed: {
     isValid() {
