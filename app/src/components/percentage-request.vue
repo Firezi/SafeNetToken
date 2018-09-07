@@ -2,9 +2,12 @@
   <div>
     <h1>Percentage Request</h1>
     <p>Current value is {{ currentPercentage }} %</p>
-    <label for="request">SNT tokens amount:</label>
-    <input v-model="requestPercentage" id="request"> <span>%</span>
-    <p><button :disabled=!isValid v-on:click="transact()">Send Transaction</button></p>
+    <b-form-group label="New Percentage:" label-for="request">
+      <b-input-group append="%">
+        <b-form-input id="request" v-model="requestPercentage"></b-form-input>
+      </b-input-group>
+    </b-form-group>
+    <b-button variant="primary" :disabled="!isValid" v-on:click="transact()">Send Transaction</b-button>
   </div>
 </template>
 
