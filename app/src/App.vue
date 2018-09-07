@@ -9,7 +9,7 @@
         <b-collapse is-nav id="nav_collapse">
 
           <b-navbar-nav>
-            <b-nav-item-dropdown text="CreateRequest" left>
+            <b-nav-item-dropdown text="CreateRequest" right>
               <b-dropdown-item href="enter">Enter to cooperation</b-dropdown-item>
               <b-dropdown-item href="percentage">Change percentage</b-dropdown-item>
             </b-nav-item-dropdown>
