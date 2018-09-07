@@ -1,13 +1,7 @@
 <template>
   <div>
-    <h1>Main Page</h1>
-    <router-link :to="{ name: 'enter-request' }">Create request</router-link>
-    <br>
-    <router-link :to="{ name: 'requests-list' }">Requests list</router-link>
-    <br>
-    <router-link :to="{ name: 'user-page' }">Profile</router-link>
-    <br>
-    <router-link :to="{ name: 'percentage-request' }">Create percentage change request</router-link>
+    <h1>SafeNet Cooperation</h1>
+    <h3>Welcome!</h3>
   </div>
 </template>
 
