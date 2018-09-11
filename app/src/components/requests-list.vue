@@ -2,7 +2,7 @@
   <div>
     <h1>Requests List</h1>
     <div v-for="request in $store.state.requestsList">
-      <b-card class="mt-3" header-bg-variant="light" :header="types[request.rType]">
+      <b-card class="mb-3" header-bg-variant="light" :header="types[request.rType]">
         <b-row class="mb-1">
           <b-col cols="auto" class="mr-auto">Request №{{ request.id }}</b-col>
           <b-col cols="auto">{{ request.beneficiary }}</b-col>
