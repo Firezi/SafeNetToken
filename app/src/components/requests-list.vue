@@ -7,9 +7,18 @@
           <b-col cols="auto" class="mr-auto">Request №{{ request.id }}</b-col>
           <b-col cols="auto">{{ request.beneficiary }}</b-col>
         </b-row>
-        <div class="mb-1" v-if="request.rType < 4">{{ (request.tokensAmount / 10**18).toFixed(2) }} SNT</div>
-        <div class="mb-1" v-if="request.rType == 4">{{ request.percentage }}%</div>
-        <div class="mb-1" v-if="request.rType == 2"> {{ (request.ethAmount / 10**18).toFixed(3) }} Eth</div>
+        <b-row class="mb-1" v-if="request.rType < 4">
+          <b-col cols="1" class="deskr">Tokens:</b-col>
+          <b-col>{{ (request.tokensAmount / 10**18).toFixed(2) }} SNT</b-col>
+        </b-row>
+        <b-row class="mb-1" v-if="request.rType == 4">
+          <b-col cols="1" class="deskr">Percentage:</b-col>
+          <b-col>{{ request.percentage }}%</b-col>
+        </b-row>
+        <b-row class="mb-1" v-if="request.rType == 2">
+          <b-col cols="1" class="deskr">Eth amount:</b-col>
+          <b-col>{{ (request.ethAmount / 10**18).toFixed(3) }} Eth</b-col>
+        </b-row>
         <b-row>
           <b-col cols="auto" class="mr-auto">
             <b-button :to="{ name: 'request', params: {requestId: request.id} }" variant="primary">Go to request</b-button>
@@ -58,3 +67,11 @@ export default {
   },
 }
 </script>
+
+
+<style>
+  .deskr {
+    white-space: nowrap;
+    color: gray;
+  }
+</style>

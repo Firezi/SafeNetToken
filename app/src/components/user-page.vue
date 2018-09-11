@@ -88,6 +88,7 @@
 
 <style>
   .deskr {
+    white-space: nowrap;
     color: gray;
   }
 </style>
