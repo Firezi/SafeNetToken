@@ -1,17 +1,48 @@
 <template>
   <div>
-    <h1>Request #{{ $route.params.requestId }}</h1>
-    <h4>{{ types[$store.state.request.rType] }}</h4>
-    <p>{{ $store.state.request.beneficiary }}</p>
-    <p v-if="$store.state.request.rType < 4">{{ ($store.state.request.tokensAmount / 10**18).toFixed(2) }} SNT</p>
-    <p v-if="$store.state.request.rType == 2"> {{ ($store.state.request.ethAmount / 10**18).toFixed(3) }} Eth</p>
-    <p v-if="$store.state.request.rType == 4">{{ $store.state.request.percentage }}%</p>
-    <pre v-if="$store.state.request.rType < 2">{{ treatyText }}</pre>
-    <p>{{ status[$store.state.request.isConfirmed] }}</p>
-    <p>ConfirmedTokens: {{ ($store.state.request.tokensConfirmed / 10**18).toFixed(2) + ' / ' +  ($store.state.request.tokensInOwners / 10**18).toFixed(2) + ' SNT'}}</p>
-    <button v-if="rejectButton" v-on:click="rejectRequest()">Reject confirmation</button>
-    <button v-if="acceptButton" v-on:click="acceptRequest()">Confirm</button>
-    <button v-if="removeButton" v-on:click="removeRequest()">Remove request and return funds</button>
+    <h1>Request №{{ $route.params.requestId }}</h1>
+    <b-row class="mb-1">
+      <b-col class="deskr" cols="1">Type:</b-col>
+      <b-col><strong>{{ types[$store.state.request.rType] }}</strong></b-col>
+    </b-row>
+    <b-row class="mb-1">
+      <b-col class="deskr" cols="1">Address:</b-col>
+      <b-col>{{ $store.state.request.beneficiary }}</b-col>
+    </b-row>
+    <b-row v-if="$store.state.request.rType < 4" class="mb-1">
+      <b-col class="deskr" cols="1">Tokens:</b-col>
+      <b-col>{{ ($store.state.request.tokensAmount / 10**18).toFixed(2) }} SNT</b-col>
+    </b-row>
+    <b-row v-if="$store.state.request.rType == 2" class="mb-1">
+      <b-col class="deskr" cols="1">Eth amount:</b-col>
+      <b-col>{{ ($store.state.request.ethAmount / 10**18).toFixed(3) }} Eth</b-col>
+    </b-row>
+    <b-row v-if="$store.state.request.rType == 4" class="mb-1">
+      <b-col class="deskr" cols="1">Percentage:</b-col>
+      <b-col>{{ $store.state.request.percentage }}%</b-col>
+    </b-row>
+    <b-row v-if="$store.state.request.rType < 2" class="mb-1">
+      <b-col class="deskr" cols="1">Treaty text:</b-col>
+      <b-col>
+        <b-card v-if="$store.state.request.rType < 2" body-bg-variant="light" class="mb-2" style="width: auto;">
+          <pre >{{ treatyText }}</pre>
+        </b-card>
+      </b-col>
+    </b-row>
+    <b-row class="mb-1">
+      <b-col class="deskr" cols="1">Status:</b-col>
+      <b-col><h5><b-badge :variant="badge[$store.state.request.isConfirmed]">{{ status[$store.state.request.isConfirmed] }}</b-badge></h5></b-col>
+    </b-row>
+    <b-row class="mb-1">
+      <b-col class="deskr" cols="1">Confirmed:</b-col>
+      <b-col>{{ ($store.state.request.tokensConfirmed / 10**18).toFixed(2) + ' / ' +  ($store.state.request.tokensInOwners / 10**18).toFixed(2) + ' SNT'}}</b-col>
+    </b-row>
+    <b-progress v-if="$store.state.request.isConfirmed == 0" :value="confirmedTokens" :max="tokensToConfirm" class="mb-4" striped animated>
+
+    </b-progress>
+    <b-button v-if="rejectButton" variant="danger" v-on:click="rejectRequest()">Reject confirmation</b-button>
+    <b-button v-if="acceptButton" variant="success" v-on:click="acceptRequest()">Confirm</b-button>
+    <b-button v-if="removeButton" variant="secondary" v-on:click="removeRequest()">Remove request and return funds</b-button>
   </div>
 </template>
 
@@ -33,7 +64,12 @@ import ipfs from '../ipfs.js'
           'Declined by Investor',
           'Confirmed'
         ],
-        treatyText: 'Loading...'
+        treatyText: 'Loading...',
+        badge: [
+          'warning',
+          'danger',
+          'success'
+        ]
       }
     },
     beforeCreate() {
@@ -67,6 +103,12 @@ import ipfs from '../ipfs.js'
       removeButton () {
         return this.$store.state.request.rType == 2 && this.$store.state.request.isConfirmed == 0
           && this.$store.state.request.beneficiary.toLowerCase() == this.$store.state.user.address.toLowerCase();
+      },
+      confirmedTokens () {
+        return this.$store.state.request.tokensConfirmed / 10**18;
+      },
+      tokensToConfirm () {
+        return this.$store.state.request.tokensInOwners / 10**18 / 2;
       }
     },
     methods: {
@@ -88,3 +130,10 @@ import ipfs from '../ipfs.js'
     }
   }
 </script>
+
+<style>
+  .deskr {
+    white-space: nowrap;
+    color: gray;
+  }
+</style>
