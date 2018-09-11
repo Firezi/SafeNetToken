@@ -1,29 +1,29 @@
 <template>
   <div>
     <h1>Create Request</h1>
-    <!--<form id="createRequestForm">-->
-      <p>Choose the role:</p>
-      <select v-model="selectedType">
+    <b-form-group>
+      <b-form-select v-model="selectedType">
         <option v-for="type in types" v-bind:value="type.value">
           {{ type.text }}
         </option>
-      </select>
-      <p v-if="selectedType > 0">
-        <label for="tokensAmount">SNT tokens amount:</label>
-        <input v-model="tokensAmount" id="tokensAmount" placeholder="100.0"> <span>SNT</span>
-      </p>
-      <p v-if="selectedType === 3">
-        <label for="ethAmount">Eth amount:</label>
-        <input v-model="ethAmount" id="ethAmount" placeholder="100.0"> <span>ETH</span>
-      </p>
-      <p v-if="selectedType === 1 || selectedType === 2">
-        <label for="treatyText">Text of the treaty:</label>
-        <textarea v-model="treatyText" id="treatyText" placeholder="Enter here"></textarea>
-      </p>
-      <p v-if="selectedType > 0">
-        <button :disabled=!isValid v-on:click="transact()">Send Transaction</button>
-      </p>
-    <!--</form>-->
+      </b-form-select>
+    </b-form-group>
+    <b-form-group v-if="selectedType > 0" label="SNT tokens amount:" label-for="tokensAmount">
+      <b-input-group append="SNT">
+        <b-form-input id="tokensAmount" v-model="tokensAmount" placeholder="100.0"></b-form-input>
+      </b-input-group>
+    </b-form-group>
+    <b-form-group v-if="selectedType == 3" label="Eth amount:" label-for="ethAmount">
+      <b-input-group append="ETH">
+        <b-form-input id="ethAmount" v-model="ethAmount" placeholder="100.0"></b-form-input>
+      </b-input-group>
+    </b-form-group>
+    <b-form-group v-if="selectedType == 1 || selectedType == 2" label="Treaty text:" label-for="treatyText">
+      <b-form-textarea id="treatyText" v-model="treatyText" :rows="4" placeholder="Enter here"></b-form-textarea>
+    </b-form-group>
+    <b-button variant="primary" v-if="selectedType > 0" :disabled="!isValid" v-on:click="transact()">
+      Send Transaction
+    </b-button>
   </div>
 </template>
 
@@ -35,6 +35,7 @@ export default {
     return {
       selectedType: 0,
       types: [
+        {text: 'Please select a role', value: 0},
         {text: 'Owner', value: 1},
         {text: 'Team', value: 2},
         {text: 'Eth investor', value: 3},
@@ -42,10 +43,16 @@ export default {
       ],
       tokensAmount: '',
       ethAmount: '',
-      treatyText: ''
+      treatyText: '',
+      showSuccess: false
     }
   },
   beforeCreate() {
+    this.$store.dispatch('getMetamaskStatus').then(result => {
+      if (!result) {
+        this.$router.push({ name: 'download-metamask' });
+      }
+    });
     this.$store.dispatch('getUser');
     this.$store.dispatch('getTreatiesContract');
   },

@@ -6,6 +6,7 @@ import Request from  '@/components/request'
 import Main from '@/components/main'
 import UserPage from '@/components/user-page'
 import PercentageRequest from '@/components/percentage-request'
+import DownloadMetamask from '@/components/download-metamask'
 
 Vue.use(Router);
 
@@ -41,6 +42,11 @@ export default new Router({
       path: '/percentage',
       name: 'percentage-request',
       component: PercentageRequest
+    },
+    {
+      path: '/download-metamask',
+      name: 'download-metamask',
+      component: DownloadMetamask
     }
   ]
 })
