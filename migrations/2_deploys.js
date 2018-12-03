@@ -1,5 +1,5 @@
 var fs = require('fs');
-eval(fs.readFileSync('../deploy-config.js')+'');
+eval(fs.readFileSync('../deploy-config.js') + '');
 
 var SafeNetToken = artifacts.require("./SafeNetToken.sol");
 var Treaties = artifacts.require("./Treaties.sol");
